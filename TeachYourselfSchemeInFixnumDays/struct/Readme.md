@@ -40,7 +40,7 @@ Scheme中的简单包含 `booleans` (布尔类型) , `number`(数字类型), `ch
 
 symbols通常在Scheme程序中被用来当做变量的标识，求值后可以得到变量所代表的值
 
-我们还可以使用`define` 将symbol 类型的数据 如`xyz`当成一个全局的变量来使用：
+我们还可以使用`define` 将 symbol 类型的数据 如`xyz`当成一个全局的变量来使用：
 
 ```scheme
 (define xyz 9)
@@ -58,7 +58,7 @@ Scheme 的 symbols 类型通常都是不区分大小写的。
 
 
 
-string
+### string
 
 Strings是自运算类型。
 
@@ -112,7 +112,7 @@ Strings是自运算类型。
 
 Vectors 的元素可以是任何类型。同样`vector-ref` 和`vector-set!`分别可以访问和修改向量元素。
 
-### Dotted pairs(点对) 和 lists(列表)
+### Dotted pairs(点对)
 
 点对的第一个值被称作car，第二个值被称作cdr，而将两个值组合成点值对的过程是cons。
 
@@ -127,6 +127,10 @@ Vectors 的元素可以是任何类型。同样`vector-ref` 和`vector-set!`分�
 ```
 
 点对的元素可以通过修改器过程`set-car!` 和`set-cdr!`来进行修改：
+
+### list
+
+`()` 是个列表，
 
 圆括号的S-表达式表示了链表结构。有多种方式将相同的列表表示为一个S-表达式。`cons`可以用“点对表示法”写为`(a . b)`，这里的`a`是`car`而`b`是`cdr`。更长的正当列表可以用点对表示法写为`(a . (b . (c . (d . nil))))`。这通常简写为列表表示法的`(a b c d)`。一个非正当列表[[68\]](https://zh.wikipedia.org/wiki/LISP#cite_note-r3sL3-68)，可以用二者的组合来书写，比如列表`(a b c . d)`有三个`cons`，最后的`cdr`是`d`（也就是完全特殊形式下的`(a . (b . (c . d)))`）。
 
