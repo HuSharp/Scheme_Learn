@@ -150,5 +150,17 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 
 ![image-20220206231609414](../assets/blog_image/README/image-20220206231609414.png)
 
+接着进行种种练习，包括：
+
+`insertR` 、`insertL`、`subst`、`subst2`、`multirember`、`multiInsert`...
+
+
+
+### 四、在递归时总是改变至少一个参数。
+
+该参数必须向着不断接近结束条件而改变，改变的参数必须在结束条件中得以测试：比如当使用 `cdr` 时，用 `null?` 测试是否结束。
+
+
+
 
 
