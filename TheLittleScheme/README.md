@@ -60,8 +60,9 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 
 ### 一、在表达任意函数时，总是将询问 null? 作为问题之首
 
-- 在对一个原子列表 lat 进行递归调用时，询问 `(null?lat)`
-- 在对一个数字 n 进行递归调用时，询问 `(zero?n)`
+- 在对一个原子列表 lat 进行递归调用时，询问 `(null?lat) 和 else`
+- 在对一个数字 n 进行递归调用时，询问 `(zero?n) 和 else`
+- 在对一个 S-表达式列表 l 进行递归调用时，询问三个有关 l 的问题：`(null? lat)、(atom? (car l)) 和 else`
 
 #### lat?
 
@@ -105,6 +106,26 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 
 (rember 1 '(1 2 3))
 (rember "a" '("a" "b" "c"))
+```
+
+#### rember*
+
+现在不仅要递归列表的 cdr， 还要递归列表的 car。
+
+```scheme
+; The rember* function removes all matching atoms from an s-expression
+;
+(define rember*
+    (lambda (a lat) 
+        (cond 
+            ((null? lat) '())
+            ((atom? (car lat))
+                (cond 
+                    ((eq? (car lat) a) (rember* a (cdr lat)))
+                    (else (cons (car lat)
+                                (rember* a (cdr lat))) )))
+            (else (cons (rember* a (car lat))           ; (car lat) 可以不为原子
+                        (rember* a (cdr lat)) ) ) )))
 ```
 
 ### 二、使用 cons 来构建列表
@@ -161,6 +182,12 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 
 ### 四、在递归时总是改变至少一个参数。
 
+递归时总是改变至少一个参数。
+
+- 当对一个原子列表 lat 进行递归调用时，使用 （cdr lat）；
+- 当对数字 n 进行递归调用时，使用 （sub1 n)；
+- 当对一个 S-表达式 lat 进行递归调用时，只要是 (null? lat) 和 (atom? (car lat)) 都不为 true，那么同时使用 (car lat) 和 (cdr lat)；
+
 该参数必须向着不断接近结束条件而改变，改变的参数必须在结束条件中得以测试：比如当使用 `cdr` 时，用 `null?` 测试是否结束；当使用 `sub1` 时，用 `zero?` 测试是否结束。
 
 
@@ -211,7 +238,12 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 
 - 针对数字的一般性结束条件是什么？      `(zero? n)`
 
-  
+
+接着进行种种练习，包括：
+
+- 运算符的实现：`o+` 、` o-`、`addtup`、`o*`、`tup+`、`o>`、`o<` 、` o=`、`o^`、`o/`、
+
+- 练习题：`olength`、`pick`、`rempick`、`no-nums`、`all-nums`、`eqan?`、`occur`...
 
 
 
@@ -220,4 +252,12 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 - 当采用 o+ 构建时，总是使用 0 作为结束代码行的值
 - 当采用 o* 构建时，总是使用 1 作为结束代码行的值
 - 当采用 cons 构建时，总是使用 `()` 作为结束代码行的值
+
+
+
+
+
+### 六、简化工作只在功能正确后开展
+
+详情见 `TheLittleScheme/chap5_stars/star*.rkt` 文件中 `eqlist` 和 `equal` 的简化过程。 
 
