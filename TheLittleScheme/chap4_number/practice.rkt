@@ -151,3 +151,4 @@
 ;
 (display "------ rewite rempick ------\n")
 (rempick2 3 '(hotdogs with hot mustard))     ; '(hotdogs with mustard)
+
