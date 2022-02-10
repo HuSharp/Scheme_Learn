@@ -259,5 +259,102 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 
 ### 六、简化工作只在功能正确后开展
 
-详情见 `TheLittleScheme/chap5_stars/star*.rkt` 文件中 `eqlist` 和 `equal` 的简化过程。 
+详情见 `TheLittleScheme/chap5_stars/star*.rkt` 文件中 `eqlist` 和 `equal` 的简化过程。
+
+
+
+ 
+
+### 七、对相同性质的 `subparts` 进行递归调用
+
+- 列表的子列表
+- 算术表达式的子表达式
+
+
+
+## 算术表达式
+
+### 中缀式
+
+第六章中下个定义：算术表达式要么是一个原子（包括数字），要么是用 `+` 、`x`、`^` 连接起来的两个算术表达式。
+
+因此对于中缀式 `(1 ^ (2 + (5 x 6)))` 可以采用诸如下面的方式，**取得相同性质表达式。**
+
+```scheme
+((eq? (car (cdr nexp)) 'o+)
+	(+ (value (car nexp))
+		(value (car (cdr (cdr nexp))))))
+```
+
+值得一提的是：
+
+```scheme
+(define aexp '((5 o+ 2) ox (3 o^ (5 o+ 2))))
+(car aexp)
+(cdr aexp)
+(cdr (cdr aexp))
+(car (cdr (cdr aexp)))
+
+;------------ 其输出为：
+'(5 o+ 2)
+'(ox (3 o^ (5 o+ 2)))
+'((3 o^ (5 o+ 2)))
+'(3 o^ (5 o+ 2))
+```
+
+`(car (cdr (cdr aexp)))` 的解释：*加上 car 是因为中间的 cdr 会加上 ()*
+
+
+
+
+
+### 前缀式
+
+可以使用取参数和运算符的思路
+
+```scheme
+(define 1st-sub-exp
+    (lambda (aexp)
+        (car (cdr aexp))))
+
+(define 2nd-sub-exp
+    (lambda (aexp)
+        (car (cdr (cdr aexp))) ))
+
+(define operator
+    (lambda (aexp)
+        (car aexp)))
+```
+
+那么实现前缀式如下：
+
+```scheme
+(define value-prefix
+    (lambda (nexp) 
+        (cond 
+            ((atom? nexp) nexp)
+            ((eq? (operator nexp) 'o+) 
+                (+ (value-prefix (1st-sub-exp nexp))
+                    (value-prefix (2nd-sub-exp nexp))))
+            ((eq? (operator nexp) 'ox)
+                (* (value-prefix (1st-sub-exp nexp))
+                    (value-prefix (2nd-sub-exp nexp))))
+            ((eq? (operator nexp) 'o^)
+                (expt (value-prefix (1st-sub-exp nexp))
+                    (value-prefix (2nd-sub-exp nexp))))
+            (else #f))))
+```
+
+
+
+### 八、使用辅助函数来抽象表达方式
+
+上面的前缀式采用 `operator`、`1st-sub-exp` 的辅助函数进行实现，改为后缀或中缀时，只需要修改相关辅助函数的实现即可。
+
+现在考虑以下情况：
+
+- 选 `()` 表示 0
+- 选 `(())` 表示 1
+- 选 `(()())` 表示 2
+- 选 `(()()())` 表示 3
 
