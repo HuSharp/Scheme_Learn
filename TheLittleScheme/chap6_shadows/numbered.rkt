@@ -35,10 +35,10 @@
 (numbered? '((5 o+ 2) ox (3 o^ (5 o+ 2))))          ; #t
 
 (define aexp '((5 o+ 2) ox (3 o^ (5 o+ 2))))
-(car aexp)
-(cdr aexp)
-(cdr (cdr aexp))
-(car (cdr (cdr aexp)))
+(car aexp)                  ; '(5 o+ 2)
+(cdr aexp)                  ; '(ox (3 o^ (5 o+ 2)))
+(cdr (cdr aexp))            ; '((3 o^ (5 o+ 2)))
+(car (cdr (cdr aexp)))      ; '(3 o^ (5 o+ 2))
 
 ; Assuming aexp is a numeric expression, numbered? can be simplified
 ;
