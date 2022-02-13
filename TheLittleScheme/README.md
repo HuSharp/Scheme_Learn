@@ -15,9 +15,9 @@
 1
 ```
 
-### 二、cdr 仅针对非空列表
+### 二、`cdr` 仅针对非空列表
 
-cdr 的发音是 “could-er"， 且 cdr 的结果为另一个列表
+cdr 的发音是 “could-er"， 且 cdr 的结果为**另一个列表**。
 
 ### 三、cons 第二个参数是任意**列表**，且结果为一个列表
 
@@ -111,6 +111,12 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 #### rember*
 
 现在不仅要递归列表的 cdr， 还要递归列表的 car。
+
+需要用 `atom` 来进行判断。
+
+> 此处就引出了一诫中的最好一项：
+>
+> 在对一个 S-表达式列表 l 进行递归调用时，询问三个有关 l 的问题：`(null? lat)、(atom? (car l)) 和 else`。
 
 ```scheme
 ; The rember* function removes all matching atoms from an s-expression
@@ -358,3 +364,131 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 - 选 `(()())` 表示 2
 - 选 `(()()())` 表示 3
 
+```scheme
+; sero? just like zero?
+;
+(define sero? 
+    (lambda (n) 
+        (null? n)))
+; edd1 just like add1
+;
+(define edd1
+    (lambda (n) 
+        (cons '() n)))
+; zub1 just like sub1
+;
+(define zub1
+    (lambda (n) 
+        (cdr n)))
+
+; .+ just like o+
+;
+(define .+
+    (lambda (m n)
+        (cond 
+            ((sero? n) m)
+            (else (edd1 (.+ m (zub1 n))) ))))
+; Example of .+
+;
+(.+ '(()) '(() ()))     ; (+ 1 2)
+;==> '(() () ())
+```
+
+那么再写一下类似 `lat`？
+
+```scheme
+(define atom?
+    (lambda (x)
+        (and (not (pair? x)) (not (null? x)))))
+; tat? just like lat?
+;
+(define tat?
+    (lambda (lat)
+        (cond 
+            ((sero? lat) #t)
+            ((atom? (car lat)) (tat? (cdr lat)) )
+            (else #f))))
+; But does tat? work
+
+(tat? '((()) (()()) (()()())))  ; (lat? '(1 2 3))
+; ==> #f
+
+; Beware of shadows.
+; 这就大错特错了，因此在进行高层次抽象时，要小心错误冷不丁的从阴影冒出。
+```
+
+
+
+### `intersectall` 
+
+首先实现 `intersect`
+
+```scheme
+; The intersect function finds the intersect between two sets
+;
+(define intersect
+    (lambda (set1 set2) 
+        (cond 
+            ((null? set1) '())
+            ((member? (car set1) set2)
+                (cons (car set1)
+                    (intersect (cdr set1) set2)))
+            (else (intersect (cdr set1) set2) ))))
+```
+
+`intersectall` 取出 S-表达式列表 l-set 的交集。
+
+采用的是，从后往前进行递归 `intersect`，即尾递归。
+
+```scheme
+(define intersectall
+    (lambda (l-set) 
+        (cond 
+            ((null? (cdr l-set)) (car l-set))
+            (else (intersect (car l-set)
+                    (intersectall (cdr l-set)))))))
+```
+
+为什么不能以下代码
+
+因为若最终是采用 null 判断时，那么此时返回 `'()` 和其他 S-表达式取交集，则为 `'()`。
+
+因此为避免上述情况，需要做到 `(cdr l-set)` 一旦为空，便返回此时不为空的 `l-set`，再加上 `(cdr l-set) ` 传入时，本就是加上了一个 `()`，因此返回则是 `(car l-set)`。
+
+```scheme
+(define intersectall
+    (lambda (l-set) 
+        (cond 
+            ((null? l-set) '())		; 在此处采用 null 判断
+            (else (intersect (car l-set)
+                    (intersectall (cdr l-set)))))))
+```
+
+
+
+
+
+如何使用两个 S-表达式 来构建一个 pair ？
+
+```scheme
+(cons (cons s1 '()))
+```
+
+
+
+### 有限函数
+
+指的是一个 pair 列表，在其中，任一 pair 的第一个元素都不与其他所有的 pair 的第一个元素相同。
+
+```scheme
+; The fun? function determines if rel is a function
+;
+(define fun?
+    (lambda (rel) 
+        (set? (firsts rel))))
+(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))     ; #t
+```
+
+### 全函数
+
+上面的 fun 函数并不是全函数，因为对于 `(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))`，存在不同的入参（pair的第一个参数），得到不同的出参（pair的第二个参数）。比如 `(4 2) 和 (6 2)` 冲突。
