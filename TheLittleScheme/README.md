@@ -492,3 +492,72 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 ### 全函数
 
 上面的 fun 函数并不是全函数，因为对于 `(fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))`，存在不同的入参（pair的第一个参数），得到不同的出参（pair的第二个参数）。比如 `(4 2) 和 (6 2)` 冲突。
+
+
+
+
+
+## lambda calculus
+
+见此 Blog
+
+### 九、用函数来抽象通用模式
+
+使用 currying 化来通过 `insert-g` 实现 insertL、insertR、rember、subst 等
+
+```scheme
+(define insert-g
+    (lambda (seq) 
+        (lambda (new old lat)
+            (cond 
+                ((null? lat) '())
+                ((eq? old (car lat))
+                    (seq new old (cdr lat)))
+                (else (cons (car lat)
+                            ((insert-g seq) new old (cdr lat))) )))))
+```
+
+例如 `insertL`
+
+首先实现 `insert-g` 中需要的 `seq`。`seqR`调用`new old lat`参数
+
+```scheme
+(define seqR
+    (lambda (new old lat) 
+        (cons old (cons new lat))))
+```
+
+而 `insertL` 则由以下方式实现。
+
+```scheme
+(define insertL (insert-g seqL))
+(define insertR (insert-g seqR))
+```
+
+最终调用`new old lat`参数
+
+```scheme
+; Test insertR
+(insertR
+    'e
+    'd
+    '(a b c d f g d h))                  ; '(a b c d e f g d h)
+```
+
+值得注意的是：
+
+对于实现 `rember` 时，
+
+由于不存在 `new old`  一说，因此在实现时存在 `#f` 来跳过 `new`。
+
+```scheme
+(define seqrem
+    (lambda (new old lat) lat))
+
+(define rember
+    (lambda (a lat) 
+        ((insert-g seqrem) #f a lat)))
+```
+
+
+
