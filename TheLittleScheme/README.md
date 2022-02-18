@@ -606,6 +606,8 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 
 直接调用`((null? lat) (col '() '()))` ，`return #f`
 
+> 值得注意的是：`(col '() '()))` 此处表示 collector 的初始值！！！
+
 ##### `a = 'tuna  lat =  '(tuna)`
 
 对于调用下面代码
@@ -617,13 +619,12 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
     a-friend)
 ```
 
-直接调用 `((eq? (car lat) a)` ，此时递归调用 `multirember&co`，发现创建一个新的 `col`，暂且命名为 `friend-tuna`，实现如下：
+直接调用 `((eq? (car lat) a)` ，此时递归调用 `multirember&co`，发现**创建出一个新的 `col`**，实现如下：
 
 ```scheme
-(define friend-tuna
-    (lambda (newlat seen) 
+(lambda (newlat seen) 
         (a-friend (cons 'tuna newlat)
-                seen)))
+                seen))
 ```
 
 作用可看到是最终调用 `a-friend` 判断 `(a-friend 'tuna '())`，当然为 `#t`
@@ -639,13 +640,12 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
     a-friend)
 ```
 
-直接调用 ` (else (multirember&co a (cdr lat) ...) ` ，此时递归调用 `multirember&co`，发现创建一个新的 `col`，暂且命名为 `friend-the`，实现如下：
+直接调用 ` (else (multirember&co a (cdr lat) ...) ` ，此时递归调用 `multirember&co`，发现**创建出一个新的 `col`**，实现如下：
 
 ```scheme
-(define friend-the
-    (lambda (newlat seen) 
+(lambda (newlat seen) 
         (a-friend (cons newlat
-                (cons 'the seen))))
+                (cons 'the seen)))
 ```
 
 作用可看到是最终调用 `a-friend` 判断 `(a-friend '() 'the`，当然为 `#f`
@@ -662,7 +662,9 @@ o- 以两个数字作为参数，并递减第二个参数 n 直到 0，n 减到 
 
 其作用是：查找 lat 的每个原子，判断该原子是否等于 a 。不等于则放在 ls1 列表中，等于则放在 ls2 中。最后调用到 `(f ls1 ls2) ` 。
 
+因此 collector 的运用，对应着 **“十、构建函数，一次收集多个值”** 简单理解为创建函数，一次收集多个值，然后对这些值进行再处理。
 
+可以发现是调用函数，初始值为 `null? ` 时的值，然后层层返回到构建的 `新col` 上去作为 `新col` 的参数。
 
 ### 回顾一下五法中的第三法：
 
@@ -686,6 +688,5 @@ cons 有两个参数，第一个参数是任意的 S-表达式，第二个参数
 '(aa bb)
 > (cons (cons 'aa '()) 'bb)
 '((aa) . bb)
-
 ```
 

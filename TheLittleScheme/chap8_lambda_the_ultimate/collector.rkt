@@ -252,9 +252,9 @@
                                 (col newlat
                                     mul (+ sum (car lat))))))))
             (else (even-only*&co (car lat)
-                    (lambda (al ap as) 
+                    (lambda (al ap as)      ;  处理 (car lat) 时得到的结果
                         (even-only*&co (cdr lat)
-                                (lambda (dl dp ds) 
+                                (lambda (dl dp ds)  ; 处理 (cdr lat) 时得到的结果
                                     (col (cons al dl)
                                         (* ap dp)
                                         (+ as ds)))))) ))))
@@ -313,14 +313,39 @@
 
 
 ;------------------------  explain collector ---------------------------
-; (define number-only*&co
-;     (lambda () #f))
+; https://luciaca.cn/posts/understanding-collector-in-scheme/
+;
+(define number-only*&co
+    (lambda (lat col)
+        (cond 
+            ((null? lat) (col '() 0))
+            ((atom? (car lat))
+                (cond 
+                    ((number? (car lat)) 
+                        (number-only*&co (cdr lat)
+                            (lambda (newlat sum) 
+                                (col (cons (car lat) newlat)
+                                    (+ sum (car lat))))))
+                    (else (number-only*&co (cdr lat) col) )))
+            ; else 后的这个 collector 需要使用 number-only*&co 来遍历 (cdr l)，挑出(cdr l)中的所有数字，并算出这些数字的和。
+            (else (number-only*&co (car lat)
+                ;「这里al, as 是 number-only*&co 处理 (car l) 时得到的结果，
+                ; 而dl, ds 是 number-only*&co 处理 (cdr l) 时得到的结果。」
+                        (lambda (alat asum) 
+                            (number-only*&co (cdr lat)
+                                (lambda (dlat dsum) 
+                                    (col (cons alat dlat) 
+                                        (+ asum dsum)))))) ))))
 
+(define cal-number
+    (lambda (newlat sum) 
+        (cons sum (cons newlat '()))))
 
-; ; 输出结果的格式（sum newlist), list的第一个元素是求和的结果，第二个元素为所取到数字集。
-; ;
-; (number-only*&co '(9 apples 2 oranges 10 peaches 11 pears) cal-number)
-; ;Value : (32 (9 2 10 11))
+(display "------ cal-number ------\n")
+; 输出结果的格式（sum newlist), list的第一个元素是求和的结果，第二个元素为所取到数字集。
+;
+(number-only*&co '(9 apples 2 oranges 10 peaches 11 pears) cal-number)
+;Value : (32 (9 2 10 11))
 
-; (number-only*&co '(9 apples (2 oranges) (10) peaches ((11)) pears) cal-number)
-; ;Value : (32 (9 (2) (10) ((11))))
+(number-only*&co '(9 apples (2 oranges) (10) peaches ((11)) pears) cal-number)
+;Value : (32 (9 (2) (10) ((11))))
