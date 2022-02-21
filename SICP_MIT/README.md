@@ -28,12 +28,3 @@
 
 
 
-书籍参考：
-
-The Reasoned Schemer
-The Little Prover
-The Little Typer
-
-SICP
-The Little Schemer
-A Little Java, A Few Patterns
