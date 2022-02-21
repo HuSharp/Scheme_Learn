@@ -7,3 +7,24 @@
 [SICP book 官网](https://mitpress.mit.edu/sites/default/files/sicp/index.html)
 
 [北大“程序设计技术和方法”幻灯片](https://www.math.pku.edu.cn/teachers/qiuzy/progtech/slides/index.php)
+
+
+
+对于一些需要导入整个文件来说，使用函数load会出错，解决办法见此：https://stackoverflow.com/questions/4809433/including-an-external-file-in-racket
+
+对被引入文件加上
+
+```scheme
+(provide (fortytwo det))
+```
+
+对引入文件加上诸如：
+
+```scheme
+(require "xxx.rkt")
+```
+
+
+
+
+
