@@ -6,11 +6,3 @@
     (* 3 (- 6 2) (- 2 7)))
 ;=> -37/150 
 
-;pra1.3
-(define bigger
-    (lambda (x y) 
-        (if (> x y)
-            x
-            y)))
-
-
