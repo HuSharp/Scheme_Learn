@@ -59,7 +59,7 @@
 
 
 
-```
+```scheme
 #lang racket
 (define (square x)
     (* x x))
@@ -92,5 +92,31 @@
 
 
 
+### common pattern
 
+高阶过程，用函数作为参数。
+
+当需要传入参数为函数时，诸如下方代码
+
+```
+(average-dump f x)
+```
+
+可以通过 `lambda` 实现如下：
+
+```scheme
+(define average-dump
+    (lambda (f) 
+        (lambda (x) 
+            (average (f x) x))))
+```
+
+以下写法与上面等价，但是我们发现，会存在一个 `foo` 的冗余变量名。
+
+```scheme
+(define (average-dump f)
+    (define (foo x)
+        (average (f x) x))
+    foo)
+```
 
