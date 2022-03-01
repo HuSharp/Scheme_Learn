@@ -37,3 +37,15 @@
         1.0))
 
 (sqrt2 100)
+
+(require "sum-of-squares.rkt")
+; 将过程作为返回值
+(define (average-damp f)
+    (lambda (x) (average x (f x))))
+((average-damp square) 10)
+
+(define (sqrt3 x)
+    (fixed-point
+        (average-damp 
+            (lambda (y) (/ x y)))
+        1.0))
